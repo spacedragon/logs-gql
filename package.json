@@ -6,7 +6,7 @@
     "dev": "next dev -p 4000",
     "debug": "NODE_OPTIONS='--inspect' next dev -p 4000",
     "build": "next build",
-    "start": "next start"
+    "start": "next start -p ${PORT}"
   },
   "dependencies": {
     "@azure/applicationinsights-query": "^1.1.0",
