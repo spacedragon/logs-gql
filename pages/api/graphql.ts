@@ -227,6 +227,7 @@ const typeDefs = gql`
     requestorId: String,
     requestorIp: String,
     arguments: String,
+    argumentsDecoded: JSON,
     workspaceId: String,
     tenantId: String,
     SourceNamespace: String,
@@ -334,6 +335,31 @@ const resolvers = {
           }
         }
       }
+    },
+    async argumentsDecoded(parent: SmtLog) {
+      const args = (parent.arguments || "").split(";").map(s => s.trim());
+      const result = {};
+      for (const arg of args) {
+        const idx = arg.indexOf("=");
+        if(idx >=0 ) {
+          const key = arg.slice(0, idx).trim();
+          const value = arg.slice(idx+1).trim();
+          if(value.startsWith("\"") && value.endsWith("\"")) {
+            result[key] = value.slice(1, -1)
+          } else if (value.endsWith("=")) {
+            const str = await decode(value);
+            try {
+              result[key] = JSON.parse(str);  
+            } catch (error) {
+              result[key]= {
+                error,
+                raw: str
+              }
+            }
+          }
+        }
+      }
+      return result;
     }
   },
   CustomEvents: {

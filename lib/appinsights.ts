@@ -2,9 +2,7 @@ import { Env, CustomEvent, Dependency } from "./types";
 import { ApplicationInsightsDataClient } from "@azure/applicationinsights-query";
 import { BasicAuthenticationCredentials } from "@azure/ms-rest-js";
 import { HttpResponseError } from "./error";
-import dotenv from "dotenv";
 import { Column } from "@azure/applicationinsights-query/esm/models";
-dotenv.config();
 
 export async function executeQuery(env:Env, q: string, timespan?: string) {
   let appId = process.env.TEST_INSIGHTS_API_ID;
