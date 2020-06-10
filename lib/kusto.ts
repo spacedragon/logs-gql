@@ -15,11 +15,13 @@ export function querySmtLog( filter?: string, limit: number = 100) {
     clientRequestProps.setOption("norequesttimeout", true);
     clientRequestProps.setOption("notruncation", true);
     clientRequestProps.setOption("request_readonly", true);
+    clientRequestProps.setOption("deferpartialqueryfailures ", false);
+    clientRequestProps.setOption("queryconsistency  ", "normalconsistency");
     const kcs = KustoConnectionStringBuilder.withAadApplicationKeyAuthentication(`https://${clusterName}.kusto.windows.net`, appId, appKey, authorityId);
     const kustoClient = new Client(kcs);
     return new Promise<SmtLog[]>( (resolve, reject) => {
         const query = `UnionOfAllLogsIncludeTest(@'SmtApiTelemetry') ${filter ? '| '+ filter : ''} | limit ${limit}`;
-        kustoClient.executeQuery("azureml", query, (err, results) => {
+        kustoClient.execute("azureml", query, (err, results) => {
             if (err) {
                 reject(new HttpResponseError(500, err.message));
             } else {
