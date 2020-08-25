@@ -1,4 +1,5 @@
 export type Maybe<T> = T | null;
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -7,7 +8,9 @@ export type Scalars = {
   Int: number;
   Float: number;
   JSON: any;
+  Date: any;
 };
+
 
 
 export enum Env {
@@ -16,7 +19,7 @@ export enum Env {
 }
 
 export type CustomDimension = {
-   __typename?: 'CustomDimension';
+  __typename?: 'CustomDimension';
   AppVersion?: Maybe<Scalars['String']>;
   ClientType?: Maybe<Scalars['String']>;
   ClientVersion?: Maybe<Scalars['String']>;
@@ -49,7 +52,7 @@ export type CustomDimension = {
 };
 
 export type CustomEvent = {
-   __typename?: 'CustomEvent';
+  __typename?: 'CustomEvent';
   timestamp: Scalars['String'];
   operationId: Scalars['ID'];
   operationParentId?: Maybe<Scalars['ID']>;
@@ -97,7 +100,7 @@ export type QueryInput = {
 };
 
 export type DependencyCustomDimension = {
-   __typename?: 'DependencyCustomDimension';
+  __typename?: 'DependencyCustomDimension';
   ApiPath: Scalars['String'];
   AppVersion?: Maybe<Scalars['String']>;
   ClientVersion?: Maybe<Scalars['String']>;
@@ -130,7 +133,7 @@ export type DependencyCustomDimension = {
 };
 
 export type Dependency = {
-   __typename?: 'Dependency';
+  __typename?: 'Dependency';
   timestamp: Scalars['String'];
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -165,7 +168,7 @@ export type Dependency = {
 };
 
 export type CustomEvents = {
-   __typename?: 'CustomEvents';
+  __typename?: 'CustomEvents';
   byScenario?: Maybe<Array<Maybe<CustomEvent>>>;
   byQuery?: Maybe<Array<Maybe<CustomEvent>>>;
 };
@@ -183,7 +186,7 @@ export type CustomEventsByQueryArgs = {
 };
 
 export type Dependencies = {
-   __typename?: 'Dependencies';
+  __typename?: 'Dependencies';
   newDependencies?: Maybe<Array<Maybe<Dependency>>>;
   byQuery?: Maybe<Array<Maybe<Dependency>>>;
 };
@@ -199,7 +202,7 @@ export type DependenciesByQueryArgs = {
 };
 
 export type UserErrors = {
-   __typename?: 'UserErrors';
+  __typename?: 'UserErrors';
   byQuery?: Maybe<Array<Maybe<CustomEvent>>>;
   byExtension?: Maybe<Array<Maybe<CustomEvent>>>;
 };
@@ -215,65 +218,76 @@ export type UserErrorsByExtensionArgs = {
 };
 
 export type SmtLog = {
-   __typename?: 'SmtLog';
+  __typename?: 'SmtLog';
   Table?: Maybe<Scalars['String']>;
-  TIMESTAMP?: Maybe<Scalars['String']>;
+  stream?: Maybe<Scalars['String']>;
+  docker?: Maybe<Scalars['String']>;
+  tag?: Maybe<Scalars['String']>;
+  Timestamp?: Maybe<Scalars['String']>;
+  SourceClassName?: Maybe<Scalars['String']>;
+  LogLevel_long?: Maybe<Scalars['Float']>;
+  LogLevel_string?: Maybe<Scalars['String']>;
+  Scopes?: Maybe<Scalars['String']>;
+  ApiName?: Maybe<Scalars['String']>;
+  ActivityId?: Maybe<Scalars['String']>;
+  ApiInvocationTime?: Maybe<Scalars['String']>;
+  Arguments?: Maybe<Scalars['String']>;
+  ArgumentsDecoded?: Maybe<Scalars['JSON']>;
+  ApiType?: Maybe<Scalars['String']>;
+  Details?: Maybe<Scalars['String']>;
+  DetailsDecoded?: Maybe<Scalars['JSON']>;
+  DurationMs?: Maybe<Scalars['Float']>;
+  EndTime?: Maybe<Scalars['String']>;
+  ErrorCode?: Maybe<Scalars['String']>;
+  ErrorSubCodes?: Maybe<Scalars['String']>;
+  HbiWorkspace_string?: Maybe<Scalars['String']>;
+  HbiWorkspace_bool?: Maybe<Scalars['Boolean']>;
+  HttpStatusCode?: Maybe<Scalars['Float']>;
+  Stats?: Maybe<Scalars['String']>;
+  RequestId?: Maybe<Scalars['String']>;
+  RequestorId?: Maybe<Scalars['String']>;
+  RequestIp?: Maybe<Scalars['String']>;
+  RequestorType?: Maybe<Scalars['String']>;
+  RequestUrl?: Maybe<Scalars['String']>;
+  ResourceGroup?: Maybe<Scalars['String']>;
+  RetryTimes?: Maybe<Scalars['Float']>;
+  StartTime?: Maybe<Scalars['String']>;
+  SubscriptionId?: Maybe<Scalars['String']>;
+  TenantId?: Maybe<Scalars['String']>;
+  UserAgent?: Maybe<Scalars['String']>;
+  WorkspaceId?: Maybe<Scalars['String']>;
+  WorkspaceName?: Maybe<Scalars['String']>;
+  WorkspaceRegion?: Maybe<Scalars['String']>;
+  Referer?: Maybe<Scalars['String']>;
+  message?: Maybe<Scalars['String']>;
+  Node?: Maybe<Scalars['String']>;
+  EnvNamespace?: Maybe<Scalars['String']>;
+  Pod?: Maybe<Scalars['String']>;
+  Container?: Maybe<Scalars['String']>;
+  FluentdIngestTimestamp?: Maybe<Scalars['Date']>;
   Tenant?: Maybe<Scalars['String']>;
   Role?: Maybe<Scalars['String']>;
   RoleInstance?: Maybe<Scalars['String']>;
-  Level?: Maybe<Scalars['Int']>;
-  ProviderGuid?: Maybe<Scalars['String']>;
-  ProviderName?: Maybe<Scalars['String']>;
-  EventId?: Maybe<Scalars['Int']>;
-  Pid?: Maybe<Scalars['Int']>;
-  Tid?: Maybe<Scalars['Int']>;
-  OpcodeName?: Maybe<Scalars['String']>;
-  KeywordName?: Maybe<Scalars['String']>;
-  TaskName?: Maybe<Scalars['String']>;
-  ChannelName?: Maybe<Scalars['String']>;
-  EventMessage?: Maybe<Scalars['String']>;
-  ActivityId?: Maybe<Scalars['String']>;
-  controllerName?: Maybe<Scalars['String']>;
-  actionName?: Maybe<Scalars['String']>;
-  httpStatusCode?: Maybe<Scalars['Int']>;
-  errorCode?: Maybe<Scalars['String']>;
-  errorSubCodes?: Maybe<Scalars['Int']>;
-  durationMs?: Maybe<Scalars['Int']>;
-  correlationRequestId?: Maybe<Scalars['String']>;
-  requestId?: Maybe<Scalars['String']>;
-  requestUrl?: Maybe<Scalars['String']>;
-  userAgent?: Maybe<Scalars['String']>;
-  exception?: Maybe<Scalars['String']>;
-  subscriptionId?: Maybe<Scalars['String']>;
-  resourceGroup?: Maybe<Scalars['String']>;
-  workspaceName?: Maybe<Scalars['String']>;
-  workspaceRegion?: Maybe<Scalars['String']>;
-  requestorType?: Maybe<Scalars['String']>;
-  requestorId?: Maybe<Scalars['String']>;
-  requestorIp?: Maybe<Scalars['String']>;
-  arguments?: Maybe<Scalars['String']>;
-  workspaceId?: Maybe<Scalars['String']>;
-  tenantId?: Maybe<Scalars['String']>;
+  Environment?: Maybe<Scalars['String']>;
+  PreciseTimeStamp?: Maybe<Scalars['Date']>;
   SourceNamespace?: Maybe<Scalars['String']>;
   SourceMoniker?: Maybe<Scalars['String']>;
   SourceVersion?: Maybe<Scalars['String']>;
-  responseBody?: Maybe<Scalars['String']>;
-  responseBodyDecoded?: Maybe<Scalars['JSON']>;
-  responseItemCount?: Maybe<Scalars['String']>;
-  hbiWorkspace?: Maybe<Scalars['String']>;
-  referer?: Maybe<Scalars['String']>;
-  appVersion?: Maybe<Scalars['String']>;
+  TaskName?: Maybe<Scalars['String']>;
+  ClientType?: Maybe<Scalars['String']>;
+  ConflictingProperties?: Maybe<Scalars['String']>;
+  Exception?: Maybe<Scalars['String']>;
 };
 
 
-export type SmtLogResponseBodyDecodedArgs = {
+export type SmtLogDetailsDecodedArgs = {
   showRaw?: Maybe<Scalars['Boolean']>;
 };
 
 export type SmtLogs = {
-   __typename?: 'SmtLogs';
+  __typename?: 'SmtLogs';
   allLogs?: Maybe<Array<Maybe<SmtLog>>>;
-  byRequestId?: Maybe<SmtLog>;
+  byRequestId?: Maybe<Array<Maybe<SmtLog>>>;
 };
 
 
@@ -287,7 +301,7 @@ export type SmtLogsByRequestIdArgs = {
 };
 
 export type Query = {
-   __typename?: 'Query';
+  __typename?: 'Query';
   customEvents?: Maybe<CustomEvents>;
   dependencies?: Maybe<Dependencies>;
   userErrors?: Maybe<UserErrors>;

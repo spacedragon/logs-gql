@@ -3,7 +3,7 @@ import dotnet from 'dotenv';
 import { HttpResponseError } from './error';
 import { SmtLog } from './types';
 dotnet.config()
-const clusterName = "amlstudio";
+const clusterName = "Viennatest";
 const appId = process.env.NEXT_PUBLIC_APP_ID
 const appKey = process.env.APP_PASSWORD;
 const authorityId = process.env.NEXT_PUBLIC_AUTHORITY_Id;
@@ -20,10 +20,10 @@ export function querySmtLog( filter?: string, limit: number = 100) {
     const kcs = KustoConnectionStringBuilder.withAadApplicationKeyAuthentication(`https://${clusterName}.kusto.windows.net`, appId, appKey, authorityId);
     const kustoClient = new Client(kcs);
     return new Promise<SmtLog[]>( (resolve, reject) => {
-        const query = `UnionOfAllLogsIncludeTest(@'SmtApiTelemetry') ${filter ? '| '+ filter : ''} | limit ${limit}`;
-        kustoClient.execute("azureml", query, (err, results) => {
+        const query = `UnionOfAllLogs(@'DesignerApiTelemetry') ${filter ? '| '+ filter : ''} | limit ${limit}`;
+        kustoClient.execute("Vienna", query, (err, results) => {
             if (err) {
-                reject(new HttpResponseError(500, err.message));
+                reject(new HttpResponseError(500,  JSON.stringify(err)));
             } else {
                 const result = results.primaryResults[0];
                 const rows = Promise.all(result.rows());
@@ -35,9 +35,9 @@ export function querySmtLog( filter?: string, limit: number = 100) {
     });
 }
 
-export async function getSmtLog(id: string): Promise<SmtLog> {
-    const logs = await querySmtLog(`where requestId=="${id}"`, 1)   
-    return logs[0]
+export async function getSmtLog(id: string): Promise<SmtLog[]> {
+    const logs = await querySmtLog(`where RequestId=="${id}"`)   
+    return logs
 }
 
 function toSmtLog(row: Client.KustoResultRow<any>): SmtLog {
