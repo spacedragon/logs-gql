@@ -15,7 +15,7 @@ import {
   SmtLogsAllLogsArgs,
   QuerySmtLogsArgs,
   SmtLogs,
-  SmtLogResponseBodyDecodedArgs,
+  SmtLogDetailsDecodedArgs,
   DependencyCustomDimension,
   DependenciesNewDependenciesArgs,
   UserErrors,
@@ -26,8 +26,10 @@ import { queryCustomEvents, queryDependencies, queryUserErrors, query, executeQu
 import GraphqlJSON from "graphql-type-json";
 import { decode } from "../../lib/decode";
 import { querySmtLog, getSmtLog } from "../../lib/kusto";
+
 const typeDefs = gql`
   scalar JSON
+  scalar Date
   enum Env {
     PROD
     TEST
@@ -191,59 +193,69 @@ const typeDefs = gql`
   }
 
   type SmtLog {
-    Table: String
-    TIMESTAMP: String
-    Tenant: String
-    Role: String
-    RoleInstance: String
-    Level: Int,
-    ProviderGuid: String,
-    ProviderName: String,
-    EventId: Int,
-    Pid: Int,
-    Tid: Int,
-    OpcodeName: String,
-    KeywordName: String,
-    TaskName: String,
-    ChannelName: String,
-    EventMessage: String,
+    Table: String,
+    stream: String,
+    docker: String,
+    tag: String,
+    Timestamp: String,
+    SourceClassName: String,
+    LogLevel_long: Float,
+    LogLevel_string: String,
+    Scopes: String,
+    ApiName: String,
     ActivityId: String,
-    controllerName: String,
-    actionName: String
-    httpStatusCode: Int
-    errorCode: String
-    errorSubCodes: Int
-    durationMs: Int,
-    correlationRequestId: String,
-    requestId: String,
-    requestUrl: String,
-    userAgent: String,
-    exception: String,
-    subscriptionId: String,
-    resourceGroup: String,
-    workspaceName: String,
-    workspaceRegion: String,
-    requestorType: String,
-    requestorId: String,
-    requestorIp: String,
-    arguments: String,
-    argumentsDecoded: JSON,
-    workspaceId: String,
-    tenantId: String,
+    ApiInvocationTime: String,
+    Arguments: String,
+    ArgumentsDecoded: JSON,
+    ApiType: String,
+    Details: String,
+    DetailsDecoded(showRaw: Boolean): JSON,
+    DurationMs: Float,
+    EndTime: String,
+    ErrorCode: String,
+    ErrorSubCodes: String,
+    HbiWorkspace_string: String,
+    HbiWorkspace_bool: Boolean,
+    HttpStatusCode: Float,
+    Stats: String,
+    RequestId: String,
+    RequestorId: String,
+    RequestIp: String,
+    RequestorType: String,
+    RequestUrl: String,
+    ResourceGroup: String,
+    RetryTimes: Float,
+    StartTime: String,
+    SubscriptionId: String,
+    TenantId: String,
+    UserAgent: String,
+    WorkspaceId: String,
+    WorkspaceName: String,
+    WorkspaceRegion: String,
+    Referer: String,
+    message: String,
+    Node: String,
+    EnvNamespace: String,
+    Pod: String,
+    Container: String,
+    FluentdIngestTimestamp: Date,
+    Tenant: String,
+    Role: String,
+    RoleInstance: String,
+    Environment: String,
+    PreciseTimeStamp: Date,
     SourceNamespace: String,
     SourceMoniker: String,
     SourceVersion: String,
-    responseBody: String,
-    responseBodyDecoded(showRaw: Boolean): JSON
-    responseItemCount: String,
-    hbiWorkspace: String,
-    referer: String,
-    appVersion: String
+    TaskName: String,
+    ClientType: String,
+    ConflictingProperties: String,
+    Exception: String
   }
 
   type SmtLogs {
     allLogs(query: QueryInput = {}): [SmtLog]
-    byRequestId(requestId: String!): SmtLog
+    byRequestId(requestId: String!): [SmtLog]
   }
 
   type Query {
@@ -252,7 +264,7 @@ const typeDefs = gql`
     userErrors(env: Env= PROD): UserErrors @cacheControl(maxAge: 60)
     smtLogs(env: Env = PROD): SmtLogs @cacheControl(maxAge: 60)
   }
-`;
+`; 
 
 const resolvers = {
   JSON: GraphqlJSON,
@@ -314,8 +326,8 @@ const resolvers = {
     }
   },
   SmtLog: {
-    async responseBodyDecoded(parent: SmtLog, args: SmtLogResponseBodyDecodedArgs) {
-      const body = parent.responseBody;
+    async DetailsDecoded(parent: SmtLog, args: SmtLogDetailsDecodedArgs) {
+      const body = parent.Details;
       if (body) {
         let str = body.trim();
         if (str.endsWith("=")){
@@ -336,8 +348,8 @@ const resolvers = {
         }
       }
     },
-    async argumentsDecoded(parent: SmtLog) {
-      const args = (parent.arguments || "").split(";").map(s => s.trim());
+    async ArgumentsDecoded(parent: SmtLog) {
+      const args = (parent.Arguments || "").split(";").map(s => s.trim());
       const result = {};
       for (const arg of args) {
         const idx = arg.indexOf("=");
@@ -356,6 +368,8 @@ const resolvers = {
                 raw: str
               }
             }
+          } else {
+            result[key] = value;
           }
         }
       }
