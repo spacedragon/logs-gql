@@ -266,6 +266,18 @@ const typeDefs = gql`
   }
 `; 
 
+const isBase64 = (str) => {
+  const notBase64 = /[^A-Z0-9+\/=]/i;
+  const len = str.length;
+  if (str === "null" || !len || len % 4 !== 0 || notBase64.test(str)) {
+    return false;
+  }
+  const firstPaddingChar = str.indexOf('=');
+  return firstPaddingChar === -1 ||
+    firstPaddingChar === len - 1 ||
+    (firstPaddingChar === len - 2 && str[len - 1] === '=');
+}
+
 const resolvers = {
   JSON: GraphqlJSON,
   Query: {
@@ -330,7 +342,7 @@ const resolvers = {
       const body = parent.Details;
       if (body) {
         let str = body.trim();
-        if (str.endsWith("=")){
+        if (isBase64(str)){
           str = await decode(str);
         } else if (str.endsWith("[truncated]")){
           return {
@@ -358,7 +370,7 @@ const resolvers = {
           const value = arg.slice(idx+1).trim();
           if(value.startsWith("\"") && value.endsWith("\"")) {
             result[key] = value.slice(1, -1)
-          } else if (value.endsWith("=")) {
+          } else if (isBase64(value)) {
             const str = await decode(value);
             try {
               result[key] = JSON.parse(str);  
